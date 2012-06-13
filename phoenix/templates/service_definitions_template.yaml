@@ -1,0 +1,19 @@
+some_app:
+  puppet_module_directory : puppet                  # This is the directory that will be added to modulepath - so it should be the root of your Puppet modules
+                                                    # The entire directory will be uploaded and sent to the remote nodes
+  puppet_manifest : some_app.pp                     # The Puppet manifest to run
+  service_configurator: phoenix.configurators.puppet_service_configurator.PuppetServiceConfigurator
+  connectivity:                                     # A list of ports that should be opened to allow connectivity to the service
+    - protocol: tcp
+      ports: [ 8080, 8081 ]
+      allowed: [ WORLD ]                            # WORLD means the ports will be open to all incoming connections
+
+some_db:
+  puppet_module_directory : puppet
+  puppet_manifest : mongo.pp
+  service_configurator: phoenix.configurators.puppet_service_configurator.PuppetServiceConfigurator
+  connectivity:
+    - protocol: tcp
+      ports: [ 27017 ]
+      allowed: [ some_service ]                   # You can specify a list of services which can connect to this service - in
+                                                  # In this case, only the some_app service can talk to this db over port 27017

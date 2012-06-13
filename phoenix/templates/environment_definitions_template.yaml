@@ -1,0 +1,16 @@
+# An Environment Definitions file can include multiple environment template
+
+dev:
+  nodes:
+  - ami_id: ami-4dad7424
+    size:   t1.micro
+    credentials_name: us-east-ssh                           # This needs to match an entry in credentials_template.yaml
+    aws_key_name : test                                     # This is the name of the AWS keypair which we instruct AWS to put on the machine
+    services: [some_db, some_app]
+    security_groups: [ SSH-EXPOSING-SG-NAME-GOES-HERE ]     # You can specify a list of already defined security groups, but at least one has to allow SSH
+    type: phoenix.providers.aws_provider.AWSNodeDefinition
+
+  node_provider:
+    class_name: AWSNodeProvider
+    public_api_key: YOUR-PUBLIC-API-HERE
+    private_api_key: YOUR-PRIVATE-API-HERE

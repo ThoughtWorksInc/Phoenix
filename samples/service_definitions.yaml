@@ -1,0 +1,43 @@
+apache:
+  puppet_module_directory : puppet
+  puppet_manifest : apache.pp
+  service_configurator: phoenix.configurators.puppet_service_configurator.PuppetServiceConfigurator
+  connectivity:
+    - protocol: tcp
+      ports: [ 80 ]
+      allowed: [ WORLD ]
+
+hello_world:
+  puppet_module_directory : puppet
+  puppet_manifest : hello_world.pp
+  service_configurator: phoenix.configurators.puppet_service_configurator.PuppetServiceConfigurator
+  connectivity:
+    - protocol: tcp
+      ports: [ 8080, 8081 ]
+      allowed: [ WORLD ]
+
+mongo:
+  puppet_module_directory : puppet
+  puppet_manifest : mongo.pp
+  service_configurator: phoenix.configurators.puppet_service_configurator.PuppetServiceConfigurator
+  connectivity:
+    - protocol: tcp
+      ports: [ 27017 ]
+      allowed: [ hello_world ]
+
+echo:
+  execute: 'ls -l > launch_details.txt'
+  service_configurator: phoenix.configurators.executing_service_configurator.ExecutingServiceConfigurator
+  connectivity:
+    - protocol: tcp
+      ports: [ 22 ]
+      allowed: [ WORLD ]
+
+lxc:
+  puppet_module_directory : puppet
+  puppet_manifest : lxc.pp
+  service_configurator: phoenix.configurators.puppet_service_configurator.PuppetServiceConfigurator
+  connectivity:
+    - protocol: tcp
+      ports: [ 50000-52000 ]
+      allowed: [ WORLD ]

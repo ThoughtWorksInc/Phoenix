@@ -1,0 +1,135 @@
+prod:
+  nodes:
+  - ami_id: ami-4dad7424
+    size:   t1.micro
+    credentials_name: us-east-ssh
+    aws_key_name : test
+    services: [hello_world]
+    security_groups: [ spicy-beef ]
+    availability_zone: us-east-1a
+    type: phoenix.providers.aws_provider.AWSNodeDefinition
+  - ami_id: ami-4dad7424
+    size:   t1.micro
+    credentials_name: us-east-ssh
+    aws_key_name : test
+    services: [hello_world]
+    security_groups: [ spicy-beef ]
+    availability_zone: us-east-1b
+    type: phoenix.providers.aws_provider.AWSNodeDefinition
+  - ami_id: ami-4dad7424
+    size:   t1.micro
+    credentials_name: us-east-ssh
+    aws_key_name : test
+    services: [apache]
+    type: phoenix.providers.aws_provider.AWSNodeDefinition
+    security_groups: [ spicy-beef ]
+
+  node_provider:
+    class_name: AWSNodeProvider
+    public_api_key: {{ aws_public_api_key }}
+    private_api_key: {{ aws_private_api_key }}
+
+elb_integration:
+  service_hooks:
+      hello_world:
+        - class_name: phoenix.hooks.elb_hook.ELBHook
+          elb_name: hello-world-us-east-1-elb
+          public_api_key: {{ aws_public_api_key }}
+          private_api_key: {{ aws_private_api_key }}
+          app_to_elb_ports: { 8080 : 8080, 8081 : 8081 }
+          app_healthcheck_target: 'HTTP:8081/healthcheck'
+  nodes:
+  - ami_id: ami-4dad7424
+    size:   t1.micro
+    credentials_name: us-east-ssh
+    aws_key_name : test
+    services: [apache, hello_world]
+    type: phoenix.providers.aws_provider.AWSNodeDefinition
+    security_groups: [ spicy-beef ]
+    region: us-east-1
+
+  node_provider:
+    class_name: AWSNodeProvider
+    public_api_key: {{ aws_public_api_key }}
+    private_api_key: {{ aws_private_api_key }}
+
+integration:
+  nodes:
+  - ami_id: ami-4dad7424
+    size:   t1.micro
+    credentials_name: us-east-ssh
+    aws_key_name : test
+    services: [apache, hello_world]
+    type: phoenix.providers.aws_provider.AWSNodeDefinition
+    security_groups: [ spicy-beef ]
+
+  node_provider:
+    class_name: AWSNodeProvider
+    public_api_key: {{ aws_public_api_key }}
+    private_api_key: {{ aws_private_api_key }}
+
+development:
+  nodes:
+  - ami_id: ami-e1e8d395
+    size:   t1.micro
+    credentials_name: eu-west-ssh
+    aws_key_name : development
+    services: [apache]
+    availability_zone: eu-west-1a
+    type: phoenix.providers.aws_provider.AWSNodeDefinition
+    security_groups: [ spicy-beef ]
+    region: eu-west-1
+
+  node_provider:
+    class_name: AWSNodeProvider
+    public_api_key: {{ aws_public_api_key }}
+    private_api_key: {{ aws_private_api_key }}
+    start_up_timeout: 60
+
+echo:
+  nodes:
+    - ami_id: ami-e1e8d395
+      size:   t1.micro
+      credentials_name: eu-west-ssh
+      aws_key_name : development
+      services: [echo]
+      type: phoenix.providers.aws_provider.AWSNodeDefinition
+      security_groups: [ spicy-beef ]
+      region: eu-west-1
+
+  node_provider:
+    class_name: AWSNodeProvider
+    public_api_key: {{ aws_public_api_key }}
+    private_api_key: {{ aws_private_api_key }}
+    start_up_timeout: 60
+
+lxc_host:
+  nodes:
+    - ami_id: ami-4dad7424
+      size:   m1.large
+      credentials_name: us-east-ssh
+      aws_key_name : test
+      services: [lxc]
+      security_groups: [ spicy-beef ]
+      type: phoenix.providers.aws_provider.AWSNodeDefinition
+
+  node_provider:
+    class_name: AWSNodeProvider
+    public_api_key: {{ aws_public_api_key }}
+    private_api_key: {{ aws_private_api_key }}
+    start_up_timeout: 60
+
+lxc_hello_world:
+  nodes:
+    - template: ubuntu
+      services: [hello_world]
+      type: phoenix.providers.lxc_provider.LXCNodeDefinition
+    - template: ubuntu
+      services: [apache]
+      type: phoenix.providers.lxc_provider.LXCNodeDefinition
+
+  node_provider:
+    class_name: LXCNodeProvider
+    host_name: ec2-184-72-150-211.compute-1.amazonaws.com
+    credentials: us-east-ssh
+    start_up_timeout: 60

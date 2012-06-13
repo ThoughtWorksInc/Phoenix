@@ -1,0 +1,12 @@
+.DS_Store
+.idea
+*.pyc
+dist
+build
+fake_nodes
+MANIFEST
+.fab_tasks~
+.envs
+test_results
+phoenix/phoenix.ini
+build_credentials

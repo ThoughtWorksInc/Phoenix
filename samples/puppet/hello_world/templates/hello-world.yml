@@ -1,0 +1,2 @@
+apacheport: <%= apache_port %>
+apachehost: <%= apache %>
