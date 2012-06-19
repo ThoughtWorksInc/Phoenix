@@ -158,7 +158,6 @@ def get_list_of_environment_definitions(config_dir, property_file=None):
 
         return environment_definitions
 
-
 @cliCall(CONFIG_DIR_OPTION, PROPERTY_FILE_OPTION)
 def list_definitions(config_dir=DEFAULT_ENVIRONMENT, property_file=None):
     formatter = TextTableEnvironmentDescriber()
@@ -215,16 +214,19 @@ def _conf_file_from_dir(dir, filename):
 
     return conf_path
 
-@contextmanager
-def env_conf_from_dir(directory, env_name, property_file, noop=False):
+def environment_definitions(directory=None, env_name="Ignored", property_file=None, noop=False):
     logger.debug("Using property file %s" % property_file)
     if not env_name:
         raise StandardError("env_name is a required field")
 
+    return _definition_from_yaml(directory, "environment_definitions.yaml",
+        partial(environment_definitions_from_yaml, service_definitions=service_defs_from_dir(directory),
+            env_name=env_name, noop=noop, all_credentials=_credentials_from_path(directory)), property_file)
+
+@contextmanager
+def env_conf_from_dir(directory, env_name, property_file, noop=False):
     try:
-        yield _definition_from_yaml(directory, "environment_definitions.yaml",
-            partial(environment_definitions_from_yaml, service_definitions=service_defs_from_dir(directory),
-                env_name=env_name, noop=noop, all_credentials=_credentials_from_path(directory)), property_file)
+        yield environment_definitions(directory, env_name, property_file, noop=noop)
     finally:
         pass
 

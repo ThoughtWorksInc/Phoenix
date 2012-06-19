@@ -40,6 +40,31 @@ def service_details(servicename):
 
     return page_not_found("No such service %s" % servicename)
 
+@app.route("/providers")
+def node_providers():
+    definitions = fabfile.environment_definitions(directory=config_location, property_file=property_file)
+
+    providers = {}
+    for definition in definitions.values():
+        node_provider = definition.node_provider
+        if not providers.has_key(node_provider):
+            providers[node_provider] = []
+
+        providers[node_provider].append(definition.env_def_name)
+
+    return render_template("providers.html", providers = providers)
+
+@app.route("/running_nodes_in/<environment_template_name>")
+def running_nodes_in_template(environment_template_name):
+    definitions = fabfile.environment_definitions(directory=config_location, property_file=property_file)
+
+    if definitions.has_key(environment_template_name):
+        definition = definitions[environment_template_name]
+        provider = definition.node_provider
+        return render_template("nodes_in_template.html", nodes = provider.list(None))
+
+    return page_not_found("No such template %s" % environment_template_name)
+
 @app.route("/services")
 def services():
     service_definitions = fabfile.service_defs_from_dir(config_location).values()

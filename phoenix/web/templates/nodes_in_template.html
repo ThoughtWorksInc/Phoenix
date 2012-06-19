@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block title %}Phoenix{% endblock %}
+{% block content %}
+    {% for node in nodes %}
+            <li>{{ node }}</li>
+    {% endfor %}
+{% endblock %}

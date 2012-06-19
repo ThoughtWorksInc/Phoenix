@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Phoenix{% endblock %}
+{% block content %}
+{% for provider, environment_templates in providers.items() %}
+<h2>{{ provider }} used in</h2>
+<ul>
+
+    {% for environment in environment_templates %}
+    <li>
+      <a href="/running_nodes_in/{{ environment }}">{{ environment }}</a>
+    </li>
+    {% endfor %}
+
+</ul>
+{% endfor %}
+{% endblock %}
