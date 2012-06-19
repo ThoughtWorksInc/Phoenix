@@ -149,16 +149,26 @@ def describe_definition(env_template=None, config_dir=DEFAULT_ENVIRONMENT, forma
         describer = _describer_for_format(format)
         print describer.describe(environment)
 
+def get_list_of_environment_definitions(config_dir, property_file=None):
+    """List available environment definitions with all their nodes"""
+    environment_definitions = []
+    with env_conf_from_dir(config_dir, 'dummy_name', property_file) as env_defs:
+        for env_template, env_vals in env_defs.items() :
+            translator = env_vals.get_node_provider().get_env_definition_translator()
+            environment = translator.translate(env_defs, env_template, service_defs_from_dir(config_dir))
+            environment.name = env_template # resetting the name to env_template as we do not have an env name
+            environment_definitions.append(environment)
+
+        print("Returning %s" % environment_definitions)
+        return environment_definitions
+
+
 @cliCall(CONFIG_DIR_OPTION, PROPERTY_FILE_OPTION)
 def list_definitions(config_dir=DEFAULT_ENVIRONMENT, property_file=None):
-    """List available environment definitions with all their nodes"""
-    with env_conf_from_dir(config_dir, 'dummy_name', property_file) as env_def:
-        for env_template, env_vals in env_def.items() :
-            translator = env_vals.get_node_provider().get_env_definition_translator()
-            environment = translator.translate(env_def, env_template, service_defs_from_dir(config_dir))
-            environment.name = env_template # resetting the name to env_template as we do not have an env name
-            yaml_formatter = YamlEnvironmentDescriber()
-            print yaml_formatter.describe(environment)
+    yaml_formatter = YamlEnvironmentDescriber()
+
+    for env_def in get_list_of_environment_definitions(config_dir, property_file):
+        print yaml_formatter.describe(env_def)
 
 @cliCall(CONFIG_DIR_OPTION, ENVIRONMENT_TEMPLATE_OPTION, RUNNING_ENVIRONMENT_OPTION, PROPERTY_FILE_OPTION)
 def terminate_environment(env_template=None, env_name=None, config_dir=DEFAULT_ENVIRONMENT, property_file=None):

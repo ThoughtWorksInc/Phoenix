@@ -78,6 +78,10 @@ def fast_tests(noseflags="", test_output='txt'):
 def running_under_go():
     return os.environ.has_key('GO_PIPELINE_LABEL')
 
+@task
+def add_build_credentials():
+    check_for_phoenix_ini()
+
 def check_for_phoenix_ini():
     if not os.path.isdir("build_credentials"):
         if running_under_go():
