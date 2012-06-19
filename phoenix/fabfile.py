@@ -156,7 +156,6 @@ def get_list_of_environment_definitions(config_dir, property_file=None):
             environment.name = env_template # resetting the name to env_template as we do not have an env name
             environment_definitions.append(environment)
 
-        print("Returning %s" % environment_definitions)
         return environment_definitions
 
 

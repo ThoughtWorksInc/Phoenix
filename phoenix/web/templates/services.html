@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block title %}Phoenix{% endblock %}
+{% block content %}
+
+        <ul>
+        {% for service_def in service_definitions %}
+          <li><a href="/service/{{ service_def.name }}">{{ service_def.name }}</a></li>
+        {% endfor %}
+        </ul>
+
+{% endblock %}

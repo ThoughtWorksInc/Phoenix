@@ -16,13 +16,36 @@ def hello():
 
 @app.route("/details/<defname>")
 def definition_details(defname):
-    definitions = fabfile.get_list_of_environment_definitions(config_dir=config_location, property_file=property_file)
+    definition = get_named_definition(defname)
 
-    for definition in definitions:
-        if definition.name == defname:
-            return render_template("def_details.html", definition=definition)
+    if definition:
+        return render_template("def_details.html", definition=definition)
 
     return page_not_found("No such template %s" % defname)
+
+
+def get_named_definition(defname):
+    definitions = fabfile.get_list_of_environment_definitions(config_dir=config_location, property_file=property_file)
+    for definition in definitions:
+        if definition.name == defname:
+            return definition
+    return None
+
+@app.route("/service/<servicename>")
+def service_details(servicename):
+    service_definitions = fabfile.service_defs_from_dir(config_location)
+
+    if service_definitions.has_key(servicename):
+        return render_template("service.html", service_definition=service_definitions[servicename])
+
+    return page_not_found("No such service %s" % servicename)
+
+@app.route("/services")
+def services():
+    service_definitions = fabfile.service_defs_from_dir(config_location).values()
+
+    return render_template("services.html", service_definitions=service_definitions)
+
 
 @app.errorhandler(404)
 def page_not_found(user_visible_error):

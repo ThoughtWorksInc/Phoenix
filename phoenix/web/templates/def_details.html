@@ -31,7 +31,7 @@
                       <td>
                           <ul>
                               {% for service in node.attributes()['services'] %}
-                              <li>{{ service }}</li>
+                              <li><a href="/service/{{ service.name }}">{{ service.name }}</a></li>
                               {% endfor %}
                           </ul>
                       </td>

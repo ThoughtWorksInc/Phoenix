@@ -65,7 +65,7 @@ class ELBHookTests(unittest.TestCase):
         """
         env_definitions = environment_definitions_from_yaml(env_yaml_str,
             self.service_definitions, 'prod', self.all_credentials)
-        elb_connectivity_mappings = env_definitions['prod'].service_lifecycle_hooks['hello_world'][0].get_elb_mappings(self.service_definitions['hello_world'].definitions['connectivity'])
+        elb_connectivity_mappings = env_definitions['prod'].service_lifecycle_hooks['hello_world'][0].get_elb_mappings(self.service_definitions['hello_world'].configuration['connectivity'])
         self.assertEqual(2, len(elb_connectivity_mappings))
         self.assertTrue((80, 8080, 'tcp') in elb_connectivity_mappings)
         self.assertTrue((81, 8081, 'tcp') in elb_connectivity_mappings)

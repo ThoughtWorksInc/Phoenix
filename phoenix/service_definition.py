@@ -65,7 +65,7 @@ def service_definitions_from_yaml(yaml_string, abs_path_to_config):
     return definition_map
 
 class ServiceDefinition:
-    def __init__(self, name, definitions, service_configurator, abs_config_path):
+    def __init__(self, name, configuration, service_configurator, abs_config_path):
         """
         name: name of the service to install
         definitions: settings for the given service
@@ -73,15 +73,18 @@ class ServiceDefinition:
         abs_config_path: where to find the configuration in an absolute sense
         """
         self.name = name
-        self.definitions = definitions
+        self.configuration = configuration
         self.service_configurator = service_configurator
         self.abs_config_path = abs_config_path
 
     def __repr__(self):
-        return self.name.__repr__()
+        return self.name.__repr__() + ":" + str(self.configuration)
 
     def __getattr__(self, attribute_name):
-        obj = self.definitions[attribute_name]
+        if attribute_name == 'configuration':
+            return ['x']
+
+        obj = self.configuration[attribute_name]
         if isinstance(obj, dict):
             return DynamicDictionary(obj)
         elif isinstance(obj, list):
@@ -97,7 +100,7 @@ class ServiceDefinition:
         self.service_configurator.config(node, self, service_to_dns)
 
     def bundle(self, attribute, bundle_name):
-        local("cd %s && tar cfz /tmp/%s %s" % (self.abs_config_path, bundle_name, self.definitions[attribute]))
+        local("cd %s && tar cfz /tmp/%s %s" % (self.abs_config_path, bundle_name, self.configuration[attribute]))
         return os.path.join("/tmp/%s" % bundle_name)
 
 class DynamicDictionary(object):

@@ -52,7 +52,7 @@ class Service():
 def service_descriptions(node_defn, service_definitions):
     services = []
     for service_name in node_defn.services:
-        services.append(Service(service_name, service_definitions[service_name].definitions['connectivity']))
+        services.append(Service(service_name, service_definitions[service_name].configuration['connectivity']))
     return services
 
 # TODO: This is butt ugly - nodes/environments should be self-describing

@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}Phoenix{% endblock %}
+{% block content %}
+
+    <h1>Service Definition Details: {{ service_definition.name }} </h1>
+
+
+    <h2>Details</h2>
+    <table class="table table-bordered table-condensed">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for name, value in service_definition.configuration.items() %}
+        <tr>
+            <td>{{ name }}</td>
+            <td>{{ value }}</td>
+        </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endblock %}
