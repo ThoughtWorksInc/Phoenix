@@ -19,14 +19,14 @@ from mockito import *
 from phoenix.providers.address import Address
 import yaml
 from phoenix.configurators.fake_service_configurator import FakeServiceConfigurator
-from phoenix.environment_description import Environment, YamlEnvironmentDescriber, Location, AWSEnvironmentDefinitionTranslator, LXCEnvironmentDefinitionTranslator, Node
+from phoenix.environment_description import EnvironmentDescription, YamlEnvironmentDescriber, Location, AWSEnvironmentDefinitionTranslator, LXCEnvironmentDefinitionTranslator, Node
 from phoenix.providers.aws_provider import AWSNodeProvider, AWSRunningNode, AWSSecurity
 
 class RunningEnvironmentTests(unittest.TestCase):
 
     def test_should_output_empty_environment_in_yaml_if_no_locations_found(self):
 
-        environment = Environment("test", None)
+        environment = EnvironmentDescription("test", None)
 
 
         yaml_formatter = YamlEnvironmentDescriber()
@@ -42,7 +42,7 @@ class RunningEnvironmentTests(unittest.TestCase):
 
         locations = [Location("us-east-1", None)]
 
-        environment = Environment("test", locations)
+        environment = EnvironmentDescription("test", locations)
 
 
         yaml_formatter = YamlEnvironmentDescriber()
@@ -82,7 +82,7 @@ class RunningEnvironmentTests(unittest.TestCase):
 
         locations = [Location("us-east-1", nodes)]
 
-        environment = Environment("test", locations)
+        environment = EnvironmentDescription("test", locations)
 
 
         yaml_formatter = YamlEnvironmentDescriber()

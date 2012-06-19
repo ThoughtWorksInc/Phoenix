@@ -31,7 +31,7 @@ from phoenix.providers.node_predicates import running_nodes
 
 class AWSNodeDefinition():
 
-    def __init__(self, ami_id=None, size=None, credentials_name=None, region='us-east-1', services=None, role=None, security_groups=None, aws_key_name=None, availability_zone=None):
+    def __init__(self, ami_id=None, size=None, credentials_name=None, region='us-east-1', services=None, security_groups=None, aws_key_name=None, availability_zone=None):
 
         """Supports the following launch parameters:
         ami_id          - AMI ID to Launch
@@ -49,7 +49,6 @@ class AWSNodeDefinition():
         self.credentials_name = credentials_name
         self.region = region
         self.services = services
-        self.role = role
         self.security_groups = security_groups
         self.aws_key_name=aws_key_name
         self.admin_user=None
@@ -80,8 +79,8 @@ class AWSNodeDefinition():
         return "AWSNodeDefinition for %s as %s" % (self.ami_id, self.size)
 
     def __repr__(self):
-        return "AWSNodeDefinition AMI:'%s' Size:'%s' Credentials:'%s' Region:'%s' Role:'%s' Services:'%s'" %\
-               (self.ami_id, self.size, self.credentials_name, self.region,self.role, self.services)
+        return "AWSNodeDefinition AMI:'%s' Size:'%s' Credentials:'%s' Region:'%s' Services:'%s'" %\
+               (self.ami_id, self.size, self.credentials_name, self.region, self.services)
 
 class AWSRunningNode():
     def __init__(self, boto_instance, aws_security, connection_provider=None):
@@ -272,7 +271,7 @@ class AWSNodeProvider:
                 region_nodes_map[node.region().name].append(node)
 
         locations = self.get_locations(region_nodes_map)
-        return phoenix.environment_description.Environment(env_name, locations)
+        return phoenix.environment_description.EnvironmentDescription(env_name, locations)
 
     def _find_node(self, identity):
         nodes = [i for i in self.connection_provider.get_all_boto_instances(self.public_api_key, self.private_api_key) if i.id == identity.decode('utf-8')]

@@ -206,7 +206,7 @@ class LXCNodeProvider(object):
         locations = []
         if not nodes is None and len(nodes) != 0:
             locations.append(Location(self.host_name, nodes))
-        return phoenix.environment_description.Environment(env_name, locations)
+        return phoenix.environment_description.EnvironmentDescription(env_name, locations)
 
 
     def shutdown(self, identity):

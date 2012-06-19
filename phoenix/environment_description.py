@@ -15,7 +15,7 @@ from texttable import Texttable
 
 import yaml
 
-class Environment():
+class EnvironmentDescription():
     def __init__(self, name, locations):
         self.name = name
         self.locations = locations
@@ -44,7 +44,7 @@ class Node():
     def attributes(self):
         return self._attributes
 
-
+# TODO: This is butt ugly - nodes/environments should be self-describing
 class AWSEnvironmentDefinitionTranslator(object):
     def translate(self, env_definitions_from_yaml, env_template, service_definitions):
         env_definition = env_definitions_from_yaml[env_template]
@@ -55,16 +55,20 @@ class AWSEnvironmentDefinitionTranslator(object):
             service_port_mappings = {}
             for service in node_defn.services:
                 service_port_mappings.update({service : service_definitions[service].definitions['connectivity']})
-            attribute_map = {'ami_id': node_defn.ami_id, 'services': service_port_mappings}
+
+            attribute_map = {'ami_id': node_defn.ami_id, 'size': node_defn.size, 'services': service_port_mappings}
+
             if not node_defn.availability_zone is None:
                 attribute_map.update({'availability_zone': node_defn.availability_zone})
+
             node_to_append = Node(attribute_map)
+
             if not node_defn.region in node_region_map.keys() :
                 node_region_map.update({node_defn.region : [node_to_append]})
             else :
                 node_region_map[node_defn.region].append(node_to_append)
 
-        return Environment(name, self.get_locations(node_region_map))
+        return EnvironmentDescription(name, self.get_locations(node_region_map))
 
     def get_locations(self, node_region_map):
         locations = []
@@ -87,7 +91,7 @@ class LXCEnvironmentDefinitionTranslator(object):
         for node_defn in env_definition.node_definitions:
             service_port_mappings = self.get_service_port_mappings(node_defn, service_definitions)
             nodes.append(Node({'template': node_defn.template,'services': service_port_mappings}))
-        return Environment(name, [Location(env_definition.node_provider.host_name, nodes)])
+        return EnvironmentDescription(name, [Location(env_definition.node_provider.host_name, nodes)])
 
 class YamlEnvironmentDescriber():
 
