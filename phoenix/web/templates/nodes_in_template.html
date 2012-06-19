@@ -1,7 +1,29 @@
 {% extends "layout.html" %}
 {% block title %}Phoenix{% endblock %}
 {% block content %}
+
+<table class="table table-bordered table-condensed">
+    <thead>
+    <tr>
+        <th>Running Environment Name</th>
+
+        {% for attr_name in attributes %}
+          <th>{{ attr_name }} </th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
     {% for node in nodes %}
-            <li>{{ node }}</li>
+        <tr>
+          <td>{{ node.environment_name() }}</td>
+
+          {% for attr_name in attributes %}
+            <td>{{ node.attributes()[attr_name] }} </td>
+          {% endfor %}
+        </tr>
     {% endfor %}
+    </tbody>
+</table>
+
+
 {% endblock %}

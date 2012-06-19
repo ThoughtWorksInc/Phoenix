@@ -61,7 +61,14 @@ def running_nodes_in_template(environment_template_name):
     if definitions.has_key(environment_template_name):
         definition = definitions[environment_template_name]
         provider = definition.node_provider
-        return render_template("nodes_in_template.html", nodes = provider.list(None))
+        nodes = provider.list(None)
+
+        if len(nodes) > 0:
+            attributes = nodes[0].attributes().keys()
+        else:
+            attributes = []
+
+        return render_template("nodes_in_template.html", nodes = nodes, attributes = attributes)
 
     return page_not_found("No such template %s" % environment_template_name)
 
