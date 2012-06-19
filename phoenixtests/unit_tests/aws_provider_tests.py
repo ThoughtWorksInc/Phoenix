@@ -19,7 +19,6 @@ from mockito.mockito import when
 import yaml
 from phoenix import fabfile
 from phoenix.providers.aws_provider import AWSNodeProvider, AWSRunningNode, AWSNodeDefinition
-from phoenix.environment_description import YamlEnvironmentDescriber
 
 all_credentials = {
     'test' : fabfile.Credentials('test', {'private_key' : 'unit-test.pem'}, "/some/path")
@@ -226,61 +225,6 @@ class AWSNodeProviderTests(unittest.TestCase):
         environment = provider.get_running_environment("test","test", all_credentials)
         self.assertIsNotNone(environment)
         self.assertEqual(0, len(environment.get_locations()))
-
-    def test_should_return_a_node_from_a_running_environment(self):
-        fake_boto_instance = mock()
-
-        tags = {
-            'services' : """
-                'apache' :
-                     80: 80""",
-            'credentials_name': 'test',
-            'env_name' : 'test',
-            'env_def_name' : 'Single-AZ Deployment',
-            }
-        fake_boto_instance.tags = tags
-        stub_region = mock()
-        stub_region.name = 'eu-west'
-        fake_boto_instance.region = stub_region
-        fake_boto_instance.image_id = '1234'
-        fake_boto_instance.id = 'id1234'
-        fake_boto_instance.public_dns_name = 'test_dns'
-        fake_boto_instance.instance_type = 'large'
-        fake_boto_instance.state = 'running'
-        fake_boto_instance.placement='us-east-1'
-
-        mock_connection_provider = mock()
-        when(mock_connection_provider).ec2_connection_for_region("eu-west", None, None).thenReturn(None)
-        when(mock_connection_provider).get_all_boto_instances(None, None).thenReturn([fake_boto_instance])
-
-        provider = AWSNodeProvider(None, None, mock_connection_provider)
-
-        environment = provider.get_running_environment("test","Single-AZ Deployment", all_credentials)
-        self.assertIsNotNone(environment)
-        self.assertIsNotNone(environment.get_locations())
-        self.assertIsNotNone(environment.get_locations()[0].get_nodes())
-        self.assertEquals('eu-west', environment.get_locations()[0].get_name())
-        node = environment.get_locations()[0].get_nodes()[0]
-
-        self.assertIsNotNone(node.get_services())
-        self.assertEquals({'apache' : {80 : 80}}, node.get_services())
-
-        expected_yaml = """
-        test:
-          locations:
-          - eu-west:
-              nodes:
-              - ami_id: '1234'
-                availability_zone: 'us-east-1'
-                dns_name: test_dns
-                id: id1234
-                services:
-                  apache: {80: 80}
-        """
-        yamlWriter = YamlEnvironmentDescriber()
-        actual_yaml = yamlWriter.describe(environment)
-
-        self.assertEqual(yaml.load(expected_yaml), yaml.load(actual_yaml))
 
     def test_should_return_a_list_of_nodes_from_a_running_environment(self):
         fake_boto_instance1 = mock()

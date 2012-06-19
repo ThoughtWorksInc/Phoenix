@@ -18,7 +18,6 @@ import os
 import os.path as path
 from contextlib import contextmanager
 
-from fabric.contrib.console import confirm
 from fabric.utils import error
 import pystache
 from texttable import Texttable
@@ -26,7 +25,7 @@ import yaml
 
 from environment_definition import environment_definitions_from_yaml
 from environment_definition import list_environments
-from phoenix.environment_description import YamlEnvironmentDescriber, SimpleTextEnvironmentDescriber, TextTableEnvironmentDescriber
+from phoenix.environment_description import SimpleTextEnvironmentDescriber, TextTableEnvironmentDescriber
 from phoenix.plogging import logger
 from phoenix.templates.templating import copy_template
 from providers.aws_provider import AWSNodeProvider
@@ -111,9 +110,7 @@ def describe_running_environment(config_dir, env_def, env_name, env_template, fo
 
 
 def _describer_for_format(format):
-    if format == 'yaml':
-        return YamlEnvironmentDescriber()
-    elif format == 'txt':
+    if format == 'txt':
         return SimpleTextEnvironmentDescriber()
     elif format == 'table':
         return TextTableEnvironmentDescriber()
@@ -165,10 +162,10 @@ def get_list_of_environment_definitions(config_dir, property_file=None):
 
 @cliCall(CONFIG_DIR_OPTION, PROPERTY_FILE_OPTION)
 def list_definitions(config_dir=DEFAULT_ENVIRONMENT, property_file=None):
-    yaml_formatter = YamlEnvironmentDescriber()
+    formatter = TextTableEnvironmentDescriber()
 
     for env_def in get_list_of_environment_definitions(config_dir, property_file):
-        print yaml_formatter.describe(env_def)
+        print formatter.describe(env_def)
 
 @cliCall(CONFIG_DIR_OPTION, ENVIRONMENT_TEMPLATE_OPTION, RUNNING_ENVIRONMENT_OPTION, PROPERTY_FILE_OPTION)
 def terminate_environment(env_template=None, env_name=None, config_dir=DEFAULT_ENVIRONMENT, property_file=None):

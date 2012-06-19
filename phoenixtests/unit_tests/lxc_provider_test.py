@@ -19,7 +19,6 @@ from mockito.mockito import when
 from phoenix.providers.lxc_provider import LXCNodeProvider, LXCNode
 import yaml
 from phoenix import fabfile
-from phoenix.environment_description import YamlEnvironmentDescriber
 
 all_credentials = {
     'test' : fabfile.Credentials('test', {'private_key' : 'unit-test.pem'}, "/some/path")
@@ -186,51 +185,6 @@ class LXCNodeProviderTests(unittest.TestCase):
         environment = provider.get_running_environment("test", "test", all_credentials)
         self.assertIsNotNone(environment)
         self.assertEqual(0, len(environment.get_locations()))
-
-
-    def test_should_return_a_node_from_a_running_environment(self):
-        mock_command_helper = mock()
-        tags = """
-            'services' :
-                 'apache': {80: 80}
-            'credentials_name': 'test'
-            'env_name' : 'test'
-            'env_def_name' : 'Single-AZ Deployment'
-            'template' : 'ubuntu'
-            """
-
-        when(mock_command_helper).run_command("sudo lxc-ls -c1").thenReturn("123")
-        when(mock_command_helper).run_command("if sudo [ -f /var/lib/lxc/123/tags ]; then sudo cat /var/lib/lxc/123/tags; else echo '{}'; fi").thenReturn(tags)
-        when(mock_command_helper).run_command("sudo lxc-info -n 123").thenReturn("state: RUNNING")
-
-        provider = LXCNodeProvider(all_credentials, "test_host", mock_command_helper)
-        environment = provider.get_running_environment("test", "Single-AZ Deployment", all_credentials)
-
-
-        self.assertIsNotNone(environment)
-        self.assertIsNotNone(environment.get_locations())
-        self.assertIsNotNone(environment.get_locations()[0].get_nodes())
-        self.assertEquals('test_host', environment.get_locations()[0].get_name())
-        node = environment.get_locations()[0].get_nodes()[0]
-
-        self.assertIsNotNone(node.get_services())
-        self.assertEquals({'apache' : {80 : 80}}, node.get_services())
-
-        expected_yaml = """
-        test:
-          locations:
-          - test_host:
-              nodes:
-              - id: '123'
-                dns_name: 'test_host'
-                services:
-                  apache: {80: 80}
-                template: 'ubuntu'
-        """
-        yamlWriter = YamlEnvironmentDescriber()
-        actual_yaml = yamlWriter.describe(environment)
-
-        self.assertEqual(yaml.load(expected_yaml), yaml.load(actual_yaml))
 
     def test_should_return_a_list_of_nodes_from_a_running_environment(self):
         mock_command_helper = mock()

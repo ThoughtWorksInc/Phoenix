@@ -13,7 +13,6 @@
 # limitations under the License.
 from texttable import Texttable
 
-import yaml
 
 class EnvironmentDescription():
     def __init__(self, name, locations):
@@ -44,19 +43,30 @@ class Node():
     def attributes(self):
         return self._attributes
 
+class Service():
+    def __init__(self, name, port_mappings):
+        self.name = name
+        self.port_mappings = port_mappings
+
+
+def service_descriptions(node_defn, service_definitions):
+    services = []
+    for service_name in node_defn.services:
+        services.append(Service(service_name, service_definitions[service_name].definitions['connectivity']))
+    return services
+
 # TODO: This is butt ugly - nodes/environments should be self-describing
 class AWSEnvironmentDefinitionTranslator(object):
+
     def translate(self, env_definitions_from_yaml, env_template, service_definitions):
         env_definition = env_definitions_from_yaml[env_template]
         name = env_definition.name
 
         node_region_map = {}
         for node_defn in env_definition.node_definitions:
-            service_port_mappings = {}
-            for service in node_defn.services:
-                service_port_mappings.update({service : service_definitions[service].definitions['connectivity']})
 
-            attribute_map = {'ami_id': node_defn.ami_id, 'size': node_defn.size, 'services': service_port_mappings}
+            attribute_map = {'ami_id': node_defn.ami_id, 'size': node_defn.size,
+                             'services': (service_descriptions(node_defn, service_definitions))}
 
             if not node_defn.availability_zone is None:
                 attribute_map.update({'availability_zone': node_defn.availability_zone})
@@ -77,11 +87,7 @@ class AWSEnvironmentDefinitionTranslator(object):
         return locations
 
 class LXCEnvironmentDefinitionTranslator(object):
-    def get_service_port_mappings(self, node_defn, service_definitions):
-        service_port_mappings = {}
-        for service in node_defn.services:
-            service_port_mappings.update({service: service_definitions[service].definitions['connectivity']})
-        return service_port_mappings
+
 
     def translate(self, env_definitions_from_yaml, env_template, service_definitions):
         env_definition = env_definitions_from_yaml[env_template]
@@ -89,32 +95,8 @@ class LXCEnvironmentDefinitionTranslator(object):
 
         nodes = []
         for node_defn in env_definition.node_definitions:
-            service_port_mappings = self.get_service_port_mappings(node_defn, service_definitions)
-            nodes.append(Node({'template': node_defn.template,'services': service_port_mappings}))
+            nodes.append(Node({'template': node_defn.template,'services': service_descriptions(node_defn, service_definitions)}))
         return EnvironmentDescription(name, [Location(env_definition.node_provider.host_name, nodes)])
-
-class YamlEnvironmentDescriber():
-
-    def _get_nodes_structure(self, nodes):
-        node_list = []
-        for node in nodes:
-            node_list.append(node.attributes())
-        return node_list
-
-    def _get_locations_structure(self, locations):
-        location_list = []
-        for location in locations:
-            nodes_map = {}
-            if not location.get_nodes() is None:
-                nodes_map = {'nodes' :self._get_nodes_structure(location.get_nodes())}
-            location_list.append({location.get_name():nodes_map})
-        return location_list
-
-    def describe(self, environment):
-        locations_map = {}
-        if not environment.get_locations() is None:
-            locations_map = {'locations' :self._get_locations_structure(environment.get_locations())}
-        return yaml.safe_dump({environment.get_name():locations_map})
 
 class SimpleTextEnvironmentDescriber():
     def describe(self, environment):

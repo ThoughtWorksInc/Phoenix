@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-import fabric
+import fabric.state
 
 
 phoenix_python_logging_level_map={'debug': logging.DEBUG, 'info': logging.INFO, 'quiet' : logging.WARN}
