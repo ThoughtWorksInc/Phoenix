@@ -82,6 +82,11 @@ package { 'virtualenvwrapper':
     provider => 'pip',
 }
 
+package { 'flask':
+    ensure => '0.8',
+    provider => 'pip',
+}
+
 group { 'puppet':
       ensure => present,
 }

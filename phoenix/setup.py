@@ -40,6 +40,7 @@ setup(
         "texttable >= 0.8.1",
         "fabric >= 1.4.1",
         "pyyaml >= 3.0.8",
-        "pystache >= 0.5.2"
+        "pystache >= 0.5.2",
+        "flask >= 0.8"
     ],
 )

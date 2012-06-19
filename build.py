@@ -116,3 +116,7 @@ def lxc_integration_tests(noseflags="", test_output='txt'):
         noseflags = noseflags + ' --with-nosexunit --core-target=test_results'
 
     local('nosetests %s phoenixtests-e "integration_aws_tests" -e "unit_tests"' % noseflags)
+
+@task
+def run_web():
+    local("cd phoenix && sh phoweb")
