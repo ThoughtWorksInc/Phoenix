@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block title %}Template Details of {{ definition.name }} - Phoenix{% endblock %}
+{% block content %}
+<h1>Template Details: {{ definition.name }}</h1>
+
+        <table class="table table-bordered table-condensed">
+            <thead>
+            <tr>
+                <th>Location</th>
+                <th>Node</th>
+                <th>Services</th>
+            </tr>
+            </thead>
+            <tbody>
+
+              {% for location in definition.get_locations() %}
+                  {% for node in location.get_nodes() %}
+                  <tr>
+                      <td>{{ location.get_name() }}</td>
+                      <td>
+                          <ul>
+                              {% for name, value in node.attributes().items() %}
+                                  {% if not name == 'services' %}
+                                  <li>
+                                      {{ name }} : {{ value }}
+                                  </li>
+                                  {% endif %}
+                              {% endfor %}
+                          </ul>
+                      </td>
+                      <td>
+                          <ul>
+                              {% for service in node.attributes()['services'] %}
+                              <li>{{ service }}</li>
+                              {% endfor %}
+                          </ul>
+                      </td>
+                  </tr>
+                  {% endfor %}
+              {% endfor %}
+
+            </tbody>
+        </table>
+
+
+
+{% endblock %}
